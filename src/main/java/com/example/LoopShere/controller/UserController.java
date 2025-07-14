@@ -2,59 +2,105 @@ package com.example.LoopShere.controller;
 
 import com.example.LoopShere.model.User;
 import com.example.LoopShere.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@CrossOrigin(origins = "*")
+@RequestMapping("/api/users")
+@CrossOrigin(origins = "http://localhost:4200")
+@RequiredArgsConstructor
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    
-    @PostMapping("/api/users/signup")
-    public String registerUserViaForm(@ModelAttribute User user, Model model) {
-        userService.saveUser(user);
-        model.addAttribute("message", "Signup successful. Please login.");
-        return "redirect:/login.html"; 
+    private final UserService userService;
+
+   
+
+    // ✅ Signup via JSON
+  @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE)
+@ResponseBody
+public ResponseEntity<?> registerUserViaJson(@Valid @RequestBody User user, BindingResult bindingResult) {
+    logger.info("Processing JSON-based signup for email: {}", user.getEmail());
+    if (bindingResult.hasErrors()) {
+        List<String> errors = bindingResult.getFieldErrors().stream()
+            .map(error -> error.getField() + ": " + error.getDefaultMessage())
+            .collect(Collectors.toList());
+        logger.error("Validation errors for signup: {}", errors);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
+    try {
+        User savedUser = userService.saveUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+    } catch (IllegalArgumentException e) {
+        logger.error("Signup failed for email: {} - {}", user.getEmail(), e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+        logger.error("Unexpected error during signup for email: {} - {}", user.getEmail(), e.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Internal server error"));
+    }
+}
 
     
-    @PostMapping("/api/users/login")
-    public String loginUserViaForm(@RequestParam String email, @RequestParam String password, Model model) {
-        String result = userService.login(email, password);
-        if ("Login successful".equals(result)) {
-            return "redirect:/welcome.html"; 
+    @PostMapping("/login")
+    @ResponseBody
+    public ResponseEntity<String> loginUser(@RequestBody Map<String, String> credentials) {
+        String email = credentials.get("email");
+        String password = credentials.get("password");
+
+        logger.info("Processing login for email: {}", email);
+
+        boolean isValid = userService.validateUser(email, password);
+        if (isValid) {
+            return ResponseEntity.ok("Login successful");
         } else {
-            model.addAttribute("error", result);
-            return "redirect:/login.html"; 
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
         }
     }
 
-    
-    @RestController
-    @RequestMapping("/api/json/users")
-    public static class JsonApiController {
+    // ✅ Get user by email
+    @GetMapping("/{email}")
+    @ResponseBody
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
+        logger.info("Fetching user by email: {}", email);
+        return userService.getUserByEmail(email)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+    }
 
-        @Autowired
-        private UserService userService;
+    // ✅ Get all users
+    @GetMapping
+    @ResponseBody
+    public ResponseEntity<List<User>> getAllUsers() {
+        logger.info("Fetching all users");
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
 
-        @PostMapping("/signup")
-        public User registerUser(@RequestBody User user) {
-            return userService.saveUser(user);
-        }
-
-        @PostMapping("/login")
-        public String loginUser(@RequestBody User loginData) {
-            return userService.login(loginData.getEmail(), loginData.getPassword());
-        }
-
-        @GetMapping("/{email}")
-        public User getUserByEmail(@PathVariable String email) {
-            return userService.getUserByEmail(email).orElse(null);
+    // ✅ Delete user by ID
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        logger.info("Deleting user with ID: {}", id);
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception e) {
+            logger.error("Failed to delete user with ID: {} - {}", id, e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 }
