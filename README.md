@@ -1,52 +1,51 @@
-🌐 LoopShere - A Full Stack Social Networking Platform
-LoopShere is a full-stack web application designed to connect users through real-time messaging, posts, notifications, friend requests, and user profiles. Built using modern technologies like Angular, Spring Boot, and MySQL, it aims to deliver a seamless, interactive user experience — similar to popular chat and social media platforms.
+# 🌐 LoopShere - A Full Stack Social Networking Platform
 
-🚀 Features
+LoopShere is a full-stack web application designed to connect users through real-time messaging, posts, notifications, friend requests, and user profiles. Built using modern technologies like Angular, Spring Boot, and MySQL, it delivers a seamless, interactive user experience — similar to WhatsApp and other social media platforms.
 
-👥 User Authentication (Sign Up & Login with JWT)
-💬 Real-Time Chat between friends
-🧑‍🤝‍🧑 Friend Requests (Send / Accept / Reject)
-📝 Post Creation with likes and comments
-🔔 Notifications system
-📂 Profile Picture Upload
-👨‍👩‍👧‍👦 Group Messaging Support
-🕒 Scheduled Posts
-📱 Responsive UI (WhatsApp-inspired)
+---
 
+## 🚀 Features
 
-🛠️ Tech Stack
-🎯 Frontend
+- 👥 **User Authentication** (Sign Up & Login with JWT)
+- 💬 **Real-Time Chat** between friends
+- 🧑‍🤝‍🧑 **Friend Requests** (Send / Accept / Reject)
+- 📝 **Post Creation** with likes and comments
+- 🔔 **Notifications** system
+- 📂 **Profile Picture Upload**
+- 👨‍👩‍👧‍👦 **Group Messaging Support**
+- 🕒 **Scheduled Posts**
+- 📱 **Responsive UI** (WhatsApp-inspired)
 
-Angular 17+
-Bootstrap 5
-HTML5, CSS3
+---
 
-💡 Backend
+## 🛠️ Tech Stack
 
-Spring Boot (Java 17+)
-Spring Security + JWT
-WebSocket (STOMP for real-time messaging)
-REST APIs
+### 🎯 Frontend
+- [Angular 17+](https://angular.io/)
+- Bootstrap 5
+- HTML5, CSS3
 
-💾 Database
+### 💡 Backend
+- Spring Boot (Java 17+)
+- Spring Security + JWT
+- WebSocket (STOMP for real-time messaging)
+- REST APIs
 
-MySQL
+### 💾 Database
+- MySQL
 
+---
 
-🧪 Run Locally
-1️⃣ Backend (Spring Boot)
-cd backend/
-./mvnw spring-boot:run
+---
 
-2️⃣ Frontend (Angular)
-cd frontend/loopshere-ui
-npm install
-ng serve
+## 🤝 Contributing
 
-Navigate to: http://localhost:4200/
+Pull requests are welcome!  
+For major changes, please open an issue first to discuss what you would like to change.
 
-🤝 Contributing
-Pull requests are welcome!For major changes, please open an issue first to discuss what you would like to change.
+---
 
-🧑‍💻 Author
-👤 Divya Pawar💼 GitHub: divyap27📧 Optional: Add your email or LinkedIn here
+## 🧑‍💻 Author
+
+**👤 Divya Pawar**  
+💼 GitHub: [divyap27](https://github.com/divyap27)  
